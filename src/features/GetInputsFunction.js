@@ -1,15 +1,21 @@
 import Input from "../shared/Input";
 import Paragraph from "../shared/Paragraph";
 import Button from "../shared/Button";
+import Test from "../shared/Test";
+import {useState} from "react";
 
-function GetInputsFunction() {
-    const fields = ["первое", "второе", "третье"];
+function GetInputsFunction({fields}) {
+    const [valueArray, setValueArray] = useState([]);
+    const valueJson = new Map();
+    console.log("все сработало")
+
     function getInputsValue() {
-        let valueArray = [];
         for (let i = 0; i < fields.length; i++) {
-            valueArray[i] = document.getElementById('input' + i).value;
+            valueJson[fields[i]] = document.getElementById('input' + i).value;
         }
-        console.log(JSON.stringify(valueArray))
+
+        console.log(JSON.stringify(valueJson));
+        //axios отправляет данные
     }
 
     return (
@@ -19,7 +25,8 @@ function GetInputsFunction() {
                     <Paragraph title={el}/>
                     <Input id={"input" + index}/>
                 </div>))}
-            <Button title={"Получить данные"} clickFunction={getInputsValue}/>
+            <Button title={"Отправить данные"} clickFunction={getInputsValue}/>
+            <Button title={"Скачать файл"} clickFunction={"axios с valueArray"}/>
         </>
     );
 }

@@ -1,5 +1,5 @@
 import axios from "axios";
-function AxiosFunction(method, url, data, responseFunction ) {
+function AxiosFunction(method, url, data) {
     return (
         axios({
             method: method,
@@ -7,8 +7,7 @@ function AxiosFunction(method, url, data, responseFunction ) {
             data: data,
         })
         .then(function (response) {
-            //Здесь вставка функции обработки резов
-            console.log(response);
+            return response.data
         })
         .catch(function (error) {
             console.log(error);
