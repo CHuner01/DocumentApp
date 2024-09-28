@@ -3,19 +3,34 @@ import Paragraph from "../shared/Paragraph";
 import Button from "../shared/Button";
 import Test from "../shared/Test";
 import {useState} from "react";
+import axios from "axios";
 
-function GetInputsFunction({fields}) {
-    const [valueArray, setValueArray] = useState([]);
+function GetInputsFunction({fields, fileName}) {
+
     const valueJson = new Map();
-    console.log("все сработало")
-
+    const mapValues = new Map();
     function getInputsValue() {
         for (let i = 0; i < fields.length; i++) {
             valueJson[fields[i]] = document.getElementById('input' + i).value;
         }
+        mapValues["templateValues"] =  valueJson
 
-        console.log(JSON.stringify(valueJson));
-        //axios отправляет данные
+        sendInputs();
+    }
+
+    function sendInputs() {
+
+        console.log("сработало")
+        axios.put("http://localhost:8181/api/v1/templates/" + fileName.toString(), JSON.stringify(mapValues), {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function (response) {
+            console.log(response)
+        })
+            .catch(function (error) {
+                console.log(error);
+            })
     }
 
     return (
@@ -25,8 +40,7 @@ function GetInputsFunction({fields}) {
                     <Paragraph title={el}/>
                     <Input id={"input" + index}/>
                 </div>))}
-            <Button title={"Отправить данные"} clickFunction={getInputsValue}/>
-            <Button title={"Скачать файл"} clickFunction={"axios с valueArray"}/>
+            <Button title={"Создать шаблон"} clickFunction={getInputsValue}/>
         </>
     );
 }

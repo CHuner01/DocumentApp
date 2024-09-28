@@ -6,16 +6,21 @@ import Button from "../shared/Button";
 import Test from "../shared/Test";
 import {useState} from "react";
 import Paragraph from "../shared/Paragraph";
+import AuthorizationWidget from "../widgets/AuthorizationWidget";
 
 
 function App() {
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
+    function checkAuthorization() {
 
+    }
 
     return (
         <>
-
+            {/*{isAuthorized ? <CreateFileWidget/> : <AuthorizationWidget />}*/}
             <CreateFileWidget/>
+
         </>
     );
 }

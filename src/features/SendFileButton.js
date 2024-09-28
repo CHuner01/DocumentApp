@@ -11,20 +11,19 @@ function SendFileButton() {
     const [fields, setFields] = useState([]);
     const [file, setFile] = useState();
     const [isGetInput, setIsGetInput] = useState(false);
+    const [fileName, setFileName] = useState("")
 
 
     const onChange = (e) => {
         setFile(e.target.files[0]);
         setIsGetInput(true)
-        console.log(file)
     }
 
-    // console.log(document.getElementById('uploadInput').files[0])
-    async function Send() {
+    async function sendFile() {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            console.log(file)
+
             await axios.post("http://localhost:8181/api/v1/templates/upload", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -34,6 +33,8 @@ function SendFileButton() {
                 }
             }).then(function (response) {
                 setFields(response.data.listOfFields);
+                setFileName(response.data.templateName);
+
             })
             .catch(function (error) {
                 console.log(error);
@@ -47,8 +48,8 @@ function SendFileButton() {
     return (
         <>
             <Input id={"uploadInput"} type={"file"} onChange={onChange} accept={".doc, .docx"} />
-            {isGetInput && <Button title={"Отправить файл"} clickFunction={Send}/>}
-            {isFileSend && <GetInputsFunction fields={fields}/>}
+            {isGetInput && <Button title={"Отправить файл"} clickFunction={sendFile}/>}
+            {isFileSend && <GetInputsFunction fields={fields} fileName={fileName}/>}
 
         </>
     );

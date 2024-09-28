@@ -2,6 +2,8 @@ function AuthorizationWidget() {
 
     return (
         <>
+            <p>Авторизация</p>
+
 
         </>
     );
