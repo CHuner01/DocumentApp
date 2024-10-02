@@ -1,15 +1,16 @@
 import Input from "../shared/Input";
 import Paragraph from "../shared/Paragraph";
-import Button from "../shared/Button";
-import Test from "../shared/Test";
-import {useState} from "react";
-import axios from "axios";
 
-function GetInputsFunction({fields, fileName}) {
+
+import axios from "axios";
+import {Button, Container, Grid2, TextField} from "@mui/material";
+
+function GetInputsFunction({checkToken, fields, fileName}) {
 
     const valueJson = new Map();
     const mapValues = new Map();
     function getInputsValue() {
+        checkToken();
         for (let i = 0; i < fields.length; i++) {
             valueJson[fields[i]] = document.getElementById('input' + i).value;
         }
@@ -19,11 +20,11 @@ function GetInputsFunction({fields, fileName}) {
     }
 
     function sendInputs() {
-
-        console.log("сработало")
+        const accessToken = localStorage.getItem('accessToken');
         axios.put("http://localhost:8181/api/v1/templates/" + fileName.toString(), JSON.stringify(mapValues), {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
             }
         }).then(function (response) {
             console.log(response)
@@ -35,12 +36,25 @@ function GetInputsFunction({fields, fileName}) {
 
     return (
         <>
-            {fields.map((el, index) => (
-                <div key={index}>
-                    <Paragraph title={el}/>
-                    <Input id={"input" + index}/>
-                </div>))}
-            <Button title={"Создать шаблон"} clickFunction={getInputsValue}/>
+            <Grid2 container spacing={2} sx={{display: "flex", flexDirection: "column"}}>
+                {fields.map((el, index) => (
+                    <div key={index}>
+                        <Grid2 item>
+                            <TextField
+                                id={"input" + index}
+                                label={el}
+                                variant="outlined"
+                            />
+                        </Grid2>
+                    </div>))}
+                <Grid2 item>
+                    <Button
+                        variant="contained"
+                        size="large"
+                        onClick={getInputsValue}
+                    >Создать шаблон</Button>
+                </Grid2>
+            </Grid2>
         </>
     );
 }

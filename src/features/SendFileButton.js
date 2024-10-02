@@ -1,12 +1,13 @@
-import Button from "../shared/Button";
+
 import Input from "../shared/Input";
 import {useState} from "react";
-import AxiosFunction from "./AxiosFunction";
-import GetInputsFunction from "./GetInputsFunction";
-import getInputsFunction from "./GetInputsFunction";
-import axios from "axios";
 
-function SendFileButton() {
+import GetInputsFunction from "./GetInputsFunction";
+
+import axios from "axios";
+import {Button, Container, Grid2, Typography} from "@mui/material";
+
+function SendFileButton({checkToken}) {
     const [isFileSend, setIsFileSend] = useState(false);
     const [fields, setFields] = useState([]);
     const [file, setFile] = useState();
@@ -21,17 +22,21 @@ function SendFileButton() {
 
     async function sendFile() {
         try {
+            checkToken();
             const formData = new FormData();
             formData.append('file', file);
-
+            console.log(file)
+            const accessToken = localStorage.getItem('accessToken');
             await axios.post("http://localhost:8181/api/v1/templates/upload", formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${accessToken}`
                 },
                 params: {
-                    name: "test.docx"
+                    name: file.name
                 }
             }).then(function (response) {
+                console.log(response)
                 setFields(response.data.listOfFields);
                 setFileName(response.data.templateName);
 
@@ -47,10 +52,36 @@ function SendFileButton() {
 
     return (
         <>
-            <Input id={"uploadInput"} type={"file"} onChange={onChange} accept={".doc, .docx"} />
-            {isGetInput && <Button title={"Отправить файл"} clickFunction={sendFile}/>}
-            {isFileSend && <GetInputsFunction fields={fields} fileName={fileName}/>}
-
+            <Container>
+                <Typography variant="h1">Создать шаблон</Typography>
+                <Grid2 container spacing={2} sx={{display: "flex", flexDirection: "column"}}>
+                    <Grid2 item>
+                        <Button
+                            variant="contained"
+                            component="label"
+                            size="large"
+                        >
+                            Выберите файл
+                            <input
+                                type="file"
+                                hidden
+                                onChange={onChange}
+                                accept={".doc, .docx"}
+                            />
+                        </Button>
+                    </Grid2>
+                    <Grid2 item>
+                        {isGetInput && <Button
+                            variant="outlined"
+                            size="large"
+                            onClick={sendFile}
+                        >Отправить файл</Button>}
+                    </Grid2>
+                    <Grid2 item>
+                        {isFileSend && <GetInputsFunction checkToken={checkToken} fields={fields} fileName={fileName}/>}
+                    </Grid2>
+                </Grid2>
+            </Container>
         </>
     );
 }

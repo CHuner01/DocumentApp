@@ -1,12 +1,24 @@
-import Button from "../shared/Button";
-import {useState} from "react";
+
+import {useEffect, useState} from "react";
 import axios from "axios";
 import Paragraph from "../shared/Paragraph";
 import Input from "../shared/Input";
 
-function GetTemplateWidget() {
+import {
+    Autocomplete,
+    Button,
+    Container,
+    FormControl, Grid2,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
+} from "@mui/material";
+
+function GetTemplateWidget({checkToken}) {
     const [templates, setTemplates] = useState([]);
-    const [selectedTemplate, setSelectedTemplate] = useState();
+    const [selectedTemplate, setSelectedTemplate] = useState("Шаблон");
     const [isTemplateSelected, setIsTemplateSelected] = useState(false);
     const [isInputs, setIsInputs] = useState(false);
     const [fields, setFields] = useState([]);
@@ -16,28 +28,45 @@ function GetTemplateWidget() {
 
     const valueJson = new Map();
     const mapValues = new Map();
-    const onChange = (e) => {
-        setSelectedTemplate(e.target.value);
+    const onChange = (event, value) => {
+        setSelectedTemplate(value);
         setIsTemplateSelected(true);
     }
     function getTemplates() {
-        axios.get("http://localhost:8181/api/v1/templates")
+        checkToken();
+        const accessToken = localStorage.getItem('accessToken');
+        axios.get("http://localhost:8181/api/v1/templates",
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            })
             .then(function (response) {
+                console.log(response)
+                let tmpArray = [];
+                for (let i = 0; i < response.data.length; i++) {
+                    tmpArray.push(response.data[i].templateName)
+                }
 
-            let tmpArray = [];
-            for (let i = 0; i < response.data.length; i++) {
-                tmpArray.push(response.data[i].templateName)
-            }
-            setTemplates(tmpArray);
-        })
+                setTemplates(tmpArray);
+
+            })
             .catch(function (error) {
                 console.log(error);
             })
+
     }
 
     function getTemplateInputs() {
-        axios.get("http://localhost:8181/api/v1/templates/" + selectedTemplate.toString())
+        checkToken();
+        const accessToken = localStorage.getItem('accessToken');
+        axios.get("http://localhost:8181/api/v1/templates/" + selectedTemplate.toString(), {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        })
             .then(function (response) {
+                console.log(response)
             setFields(Object.keys(response.data.listOfFieldsReplaceTo));
             setDescriptions(Object.values(response.data.listOfFieldsReplaceTo));
         })
@@ -48,6 +77,7 @@ function GetTemplateWidget() {
     }
 
     function getInputsValue() {
+        checkToken();
         for (let i = 0; i < fields.length; i++) {
             valueJson[fields[i]] = document.getElementById('input' + i).value;
         }
@@ -57,10 +87,13 @@ function GetTemplateWidget() {
     }
 
     function sendInputs() {
+        checkToken();
+        const accessToken = localStorage.getItem('accessToken');
         axios.post("http://localhost:8181/api/v1/documents/download", JSON.stringify(mapValues), {
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'multipart/form-data'
+                'Accept': 'multipart/form-data',
+                Authorization: `Bearer ${accessToken}`
             },
             responseType: 'blob'
         }).then(function (response) {
@@ -70,23 +103,60 @@ function GetTemplateWidget() {
                 console.log(error);
             })
     }
+    useEffect(() => {
+        getTemplates();
+    }, []);
+
 
     return (
         <>
-            <Button title={"Список шаблонов"} clickFunction={getTemplates}/>
+            <Container maxWidth="xl">
+                <Typography variant="h1">Создать файл по шаблону</Typography>
+                <Typography variant="h2">Выбери шаблон</Typography>
 
-            <select onChange={onChange}>{
-                templates.map((el, index) => <option key={index}>{el}</option>)
-            }</select>
-            {isTemplateSelected && <Button title={"Ввести данные"} clickFunction={getTemplateInputs}/>}
+                <Grid2 container spacing={1} sx={{display: "flex", flexDirection: "column", my: 2}}>
+                    <Grid2 item>
+                        <Autocomplete
+                            disablePortal
+                            options={templates}
 
-            {descriptions.map((el, index) => (
-                <div key={index}>
-                    <Paragraph title={el}/>
-                    <Input id={"input" + index}/>
-                </div>))}
+                            sx={{ width: 300}}
+                            renderInput={(params) => <TextField {...params} label="Шаблон" />}
+                            onChange={onChange}
+                        />
+                    </Grid2>
+                    <Grid2 item>
+                        {isTemplateSelected && <Button
+                            onClick={getTemplateInputs}
+                            variant="contained"
+                            size="large"
+                            sx={{"&:hover": {bgcolor: "primary.dark"}}}
+                        >Ввести данные</Button>}
+                    </Grid2>
 
-            {isInputs && <Button title={"Скачать файл"} clickFunction={getInputsValue}/>}
+                    {descriptions.map((el, index) => (
+                        <div key={index}>
+                            <Grid2 item>
+                                <Typography variant="h2">{el}</Typography>
+                                <TextField
+                                    id={"input" + index}
+                                    variant="outlined"
+                                    multiline
+                                    sx={{width: 300 }}
+                                />
+                            </Grid2>
+                        </div>))}
+
+                    <Grid2 item>
+                        {isInputs && <Button
+                            variant="contained"
+                            size="large"
+                            sx={{"&:hover": {bgcolor: "primary.dark"}}}
+                            onClick={getInputsValue}
+                        >Скачать файл</Button>}
+                    </Grid2>
+                </Grid2>
+            </Container>
         </>
     );
 }
