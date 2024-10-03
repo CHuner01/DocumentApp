@@ -5,49 +5,55 @@ import {useState} from "react";
 import GetInputsFunction from "./GetInputsFunction";
 
 import axios from "axios";
-import {Button, Container, Grid2, Typography} from "@mui/material";
+import {Button, Container, Dialog, DialogContent, DialogContentText, Grid2, TextField, Typography} from "@mui/material";
 
 function SendFileButton({checkToken}) {
     const [isFileSend, setIsFileSend] = useState(false);
     const [fields, setFields] = useState([]);
     const [file, setFile] = useState();
     const [isGetInput, setIsGetInput] = useState(false);
-    const [fileName, setFileName] = useState("")
+    const [fileNamee, setFileNamee] = useState("")
 
 
     const onChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
         setIsGetInput(true)
+        setFileNamee(selectedFile.name)
     }
 
-    async function sendFile() {
-        try {
-            checkToken();
-            const formData = new FormData();
-            formData.append('file', file);
-            console.log(file)
-            const accessToken = localStorage.getItem('accessToken');
-            await axios.post("http://localhost:8181/api/v1/templates/upload", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${accessToken}`
-                },
-                params: {
-                    name: file.name
-                }
-            }).then(function (response) {
-                console.log(response)
-                setFields(response.data.listOfFields);
-                setFileName(response.data.templateName);
+    const onChangeName = (e) => {
+        setFileNamee(e.target.value);
+        console.log(fileNamee)
+    }
 
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-        } catch (error) {
-            console.log(error)
-        }
-        setIsFileSend(true);
+    function sendFile() {
+        checkToken();
+        const formData = new FormData();
+        formData.append('file', file);
+
+
+
+        const accessToken = localStorage.getItem('accessToken');
+        axios.post("http://localhost:8181/api/v1/templates/upload", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${accessToken}`
+            },
+            params: {
+                name: fileNamee
+            }
+        }).then(function (response) {
+            console.log(response)
+            setFields(response.data.listOfFields);
+            setFileNamee(response.data.templateName);
+
+            setIsFileSend(true);
+        })
+        .catch(function (error) {
+            console.log(error);
+
+        })
     }
 
     return (
@@ -70,15 +76,27 @@ function SendFileButton({checkToken}) {
                             />
                         </Button>
                     </Grid2>
+                    {isGetInput && <>
+                        <Grid2 item>
+                            <Typography variant="h2">{"Можете указать название шаблона"}</Typography>
+                            <TextField
+                                label={file.name}
+                                variant="outlined"
+                                onChange={onChangeName}
+                                multiline
+                                sx={{width: 300}}
+                            />
+                        </Grid2>
+                        <Grid2 item>
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                onClick={sendFile}
+                            >Отправить файл</Button>
+                        </Grid2>
+                    </>}
                     <Grid2 item>
-                        {isGetInput && <Button
-                            variant="outlined"
-                            size="large"
-                            onClick={sendFile}
-                        >Отправить файл</Button>}
-                    </Grid2>
-                    <Grid2 item>
-                        {isFileSend && <GetInputsFunction checkToken={checkToken} fields={fields} fileName={fileName}/>}
+                        {isFileSend && <GetInputsFunction checkToken={checkToken} fields={fields} fileName={fileNamee}/>}
                     </Grid2>
                 </Grid2>
             </Container>

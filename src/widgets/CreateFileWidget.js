@@ -81,9 +81,9 @@ function CreateFileWidget({checkToken}) {
                         </Fab>}
                     </Grid2>
                     <Grid2 item>
-                        {isAdmin && isNewFile && <GetTemplateWidget checkToken={checkToken}/>}
+                        {isAdmin && isNewFile && <GetTemplateWidget checkToken={checkToken} isAdmin={isAdmin}/>}
                         {isAdmin && isNewTemplate && <SendFileButton checkToken={checkToken}/>}
-                        {!isAdmin && <GetTemplateWidget checkToken={checkToken}/>}
+                        {!isAdmin && <GetTemplateWidget checkToken={checkToken} isAdmin={isAdmin}/>}
                     </Grid2>
                 </Grid2>
             </Container>

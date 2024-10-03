@@ -1,14 +1,32 @@
 import Input from "../shared/Input";
 import Paragraph from "../shared/Paragraph";
 
-
 import axios from "axios";
-import {Button, Container, Grid2, TextField} from "@mui/material";
+import {
+    Button,
+    Container,
+    Dialog, DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid2,
+    Popover,
+    TextField
+} from "@mui/material";
+import {useState} from "react";
 
 function GetInputsFunction({checkToken, fields, fileName}) {
+    const [isDownloaded, setIsDownloaded] = useState(false);
+    const [isError, setIsError] = useState(false);
+    const [errorText, setErrorText] = useState();
 
     const valueJson = new Map();
     const mapValues = new Map();
+
+    function handleClose() {
+        setIsDownloaded(false);
+        setIsError(false);
+    }
     function getInputsValue() {
         checkToken();
         for (let i = 0; i < fields.length; i++) {
@@ -28,9 +46,12 @@ function GetInputsFunction({checkToken, fields, fileName}) {
             }
         }).then(function (response) {
             console.log(response)
+            setIsDownloaded(true);
         })
             .catch(function (error) {
                 console.log(error);
+                setIsError(true);
+                setErrorText(error.response.data.errors[0].message);
             })
     }
 
@@ -44,6 +65,8 @@ function GetInputsFunction({checkToken, fields, fileName}) {
                                 id={"input" + index}
                                 label={el}
                                 variant="outlined"
+                                multiline
+                                sx={{width: 300}}
                             />
                         </Grid2>
                     </div>))}
@@ -53,6 +76,19 @@ function GetInputsFunction({checkToken, fields, fileName}) {
                         size="large"
                         onClick={getInputsValue}
                     >Создать шаблон</Button>
+                    <Dialog
+                        open={isDownloaded || isError}
+                        onClose={handleClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                {isDownloaded && "Шаблон успешно создан"}
+                                {isError && errorText}
+                            </DialogContentText>
+                        </DialogContent>
+                    </Dialog>
                 </Grid2>
             </Grid2>
         </>

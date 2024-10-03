@@ -7,7 +7,7 @@ import Input from "../shared/Input";
 import {
     Autocomplete,
     Button,
-    Container,
+    Container, Dialog, DialogContent, DialogContentText, Fab,
     FormControl, Grid2,
     InputLabel,
     MenuItem,
@@ -15,14 +15,19 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-
-function GetTemplateWidget({checkToken}) {
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteIcon from '@mui/icons-material/Delete';
+import fileDownload from "js-file-download";
+function GetTemplateWidget({checkToken, isAdmin}) {
     const [templates, setTemplates] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState("Шаблон");
     const [isTemplateSelected, setIsTemplateSelected] = useState(false);
     const [isInputs, setIsInputs] = useState(false);
     const [fields, setFields] = useState([]);
     const [descriptions, setDescriptions] = useState([]);
+
+    const [isError, setIsError] = useState(false);
+    const [isTemplateDeleted, setIsTemplateDeleted] = useState(false);
 
     var fileDownload = require('js-file-download');
 
@@ -31,6 +36,8 @@ function GetTemplateWidget({checkToken}) {
     const onChange = (event, value) => {
         setSelectedTemplate(value);
         setIsTemplateSelected(true);
+
+
     }
     function getTemplates() {
         checkToken();
@@ -101,8 +108,31 @@ function GetTemplateWidget({checkToken}) {
         })
             .catch(function (error) {
                 console.log(error);
+                setIsError(true);
             })
     }
+
+    function deleteTemplate() {
+        checkToken();
+        const accessToken = localStorage.getItem('accessToken');
+        axios.delete("http://localhost:8181/api/v1/templates/" + selectedTemplate.toString(), {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        }).then(function (response) {
+            console.log(response);
+            getTemplates();
+            setIsTemplateSelected(false);
+            setIsTemplateDeleted(isTemplateDeleted => !isTemplateDeleted);
+
+            setIsInputs(false);
+            setDescriptions([])
+        })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
     useEffect(() => {
         getTemplates();
     }, []);
@@ -116,14 +146,23 @@ function GetTemplateWidget({checkToken}) {
 
                 <Grid2 container spacing={1} sx={{display: "flex", flexDirection: "column", my: 2}}>
                     <Grid2 item>
-                        <Autocomplete
-                            disablePortal
-                            options={templates}
-
-                            sx={{ width: 300}}
-                            renderInput={(params) => <TextField {...params} label="Шаблон" />}
-                            onChange={onChange}
-                        />
+                        <Grid2 container spacing={2} sx={{display: "flex", flexDirection: "row"}}>
+                            <Grid2 item>
+                                <Autocomplete
+                                    disablePortal
+                                    options={templates}
+                                    sx={{width: 300}}
+                                    renderInput={(params) => <TextField {...params} label="Шаблон" />}
+                                    onChange={onChange}
+                                    key={isTemplateDeleted}
+                                />
+                            </Grid2>
+                            <Grid2 item>
+                                {isAdmin && <Fab size="medium" color="primary" onClick={deleteTemplate}>
+                                    <DeleteIcon />
+                                </Fab>}
+                            </Grid2>
+                        </Grid2>
                     </Grid2>
                     <Grid2 item>
                         {isTemplateSelected && <Button
@@ -142,7 +181,7 @@ function GetTemplateWidget({checkToken}) {
                                     id={"input" + index}
                                     variant="outlined"
                                     multiline
-                                    sx={{width: 300 }}
+                                    sx={{width: 300}}
                                 />
                             </Grid2>
                         </div>))}
@@ -154,6 +193,19 @@ function GetTemplateWidget({checkToken}) {
                             sx={{"&:hover": {bgcolor: "primary.dark"}}}
                             onClick={getInputsValue}
                         >Скачать файл</Button>}
+
+                        <Dialog
+                            open={isError}
+                            onClose={() => setIsError(false)}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    {isError && "Файл шаблона не корректен"}
+                                </DialogContentText>
+                            </DialogContent>
+                        </Dialog>
                     </Grid2>
                 </Grid2>
             </Container>
