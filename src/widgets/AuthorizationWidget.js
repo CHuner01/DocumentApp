@@ -15,8 +15,8 @@ function AuthorizationWidget({checkToken}) {
     }
 
     function createAccount(value) {
-        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.post(API_URL + "/api/v1/auth/" + value, {
+        // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.post("/api/v1/auth/" + value, {
                 "email": email,
                 "password": password
             },

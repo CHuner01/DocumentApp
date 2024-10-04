@@ -42,8 +42,8 @@ function GetTemplateWidget({checkToken, isAdmin}) {
     function getTemplates() {
         checkToken();
         const accessToken = localStorage.getItem('accessToken');
-        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.get(API_URL + "/api/v1/templates",
+        // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.get("/api/v1/templates",
             {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
@@ -68,8 +68,8 @@ function GetTemplateWidget({checkToken, isAdmin}) {
     function getTemplateInputs() {
         checkToken();
         const accessToken = localStorage.getItem('accessToken');
-        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.get(API_URL + "/api/v1/templates/" + selectedTemplate.toString(), {
+        // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.get("/api/v1/templates/" + selectedTemplate.toString(), {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
@@ -98,8 +98,8 @@ function GetTemplateWidget({checkToken, isAdmin}) {
     function sendInputs() {
         checkToken();
         const accessToken = localStorage.getItem('accessToken');
-        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.post(API_URL + "/api/v1/documents/download", JSON.stringify(mapValues), {
+        // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.post("/api/v1/documents/download", JSON.stringify(mapValues), {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'multipart/form-data',
@@ -118,8 +118,8 @@ function GetTemplateWidget({checkToken, isAdmin}) {
     function deleteTemplate() {
         checkToken();
         const accessToken = localStorage.getItem('accessToken');
-        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.delete(API_URL + "/api/v1/templates/" + selectedTemplate.toString(), {
+        // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.delete("/api/v1/templates/" + selectedTemplate.toString(), {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }

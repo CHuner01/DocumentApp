@@ -39,8 +39,8 @@ function GetInputsFunction({checkToken, fields, fileName}) {
 
     function sendInputs() {
         const accessToken = localStorage.getItem('accessToken');
-        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.put(API_URL + "/api/v1/templates/" + fileName.toString(), JSON.stringify(mapValues), {
+        // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.put("/api/v1/templates/" + fileName.toString(), JSON.stringify(mapValues), {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken}`
