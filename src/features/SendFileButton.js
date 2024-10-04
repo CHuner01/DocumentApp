@@ -32,10 +32,9 @@ function SendFileButton({checkToken}) {
         const formData = new FormData();
         formData.append('file', file);
 
-
-
         const accessToken = localStorage.getItem('accessToken');
-        axios.post("http://localhost:8181/api/v1/templates/upload", formData, {
+        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.post(API_URL + "/api/v1/templates/upload", formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 Authorization: `Bearer ${accessToken}`

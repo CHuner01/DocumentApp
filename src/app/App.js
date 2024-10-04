@@ -84,7 +84,8 @@ function App() {
 
     function checkAccessToken() {
         const accessToken = localStorage.getItem('accessToken');
-        axios.post("http://localhost:8181/api/v1/auth/check-token", {
+        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.post(API_URL + "/api/v1/auth/check-token", {
             "token": accessToken
         },
             {
@@ -111,7 +112,8 @@ function App() {
 
     function checkRefreshToken() {
         const refreshToken = localStorage.getItem('refreshToken');
-        axios.post("http://localhost:8181/api/v1/auth/check-token", {
+        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.post(API_URL + "/api/v1/auth/check-token", {
                 "token": refreshToken
             },
             {
@@ -135,7 +137,8 @@ function App() {
 
     function getNewTokens() {
         const refreshToken = localStorage.getItem('refreshToken');
-        axios.post("http://localhost:8181/api/v1/auth/refresh-token", {
+        const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
+        axios.post(API_URL + "/api/v1/auth/refresh-token", {
             "refreshToken": refreshToken
         },{
             headers: {
