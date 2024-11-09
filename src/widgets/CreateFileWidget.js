@@ -22,7 +22,7 @@ function CreateFileWidget({checkToken}) {
     function checkAdmin() {
         const accessToken = localStorage.getItem('accessToken');
         // const API_URL = process.env.REACT_APP_HOST || 'http://localhost:8181';
-        axios.post("/api/v1/auth/role", {
+        axios.post("http://localhost:8181/api/v1/auth/role", {
             "token": accessToken,
         }, {
             headers: {
